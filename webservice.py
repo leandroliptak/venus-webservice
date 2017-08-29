@@ -1,16 +1,15 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import time, os, web, subprocess, json
+from transit_teacher import TransitTeacher
+from astrolog_wrapper import Astrolog
 
 urls = (
     '/astrolog', 'astrolog',
-    '/astrolog/now', 'now'
+    '/astrolog/now', 'now',
+    '/astrolog/transits', 'transits'
 )
 
 app = web.application(urls, globals())
-
-unicode_for_signs = { 1: "♈", 2: "♉", 3: "♊", 4: "♋", 5: "♌", 6: "♍", 7: "♎", 8: "♏",
-    9: "♐", 10: "♑", 11: "♒", 12: "♓" }
 
 class now:
     def GET(self):
@@ -18,11 +17,24 @@ class now:
         web.header('Access-Control-Allow-Credentials', 'true')        
 
         data = get_and_parse_astrolog()
-        char_sun = unicode_for_signs[data["planets"][4]["sign"]]
-        char_moon = unicode_for_signs[data["planets"][1]["sign"]]
-        char_ac = unicode_for_signs[data["houses"][1]["sign"]]
+        char_sun = TransitTeacher.unicode_for(data["planets"][4]["sign"])
+        char_moon = TransitTeacher.unicode_for(data["planets"][1]["sign"])
+        char_ac = TransitTeacher.unicode_for(data["houses"][1]["sign"])
 
-        return "j  " + char_sun + "  s  " + char_moon + "  k  " + char_ac
+        return TransitTeacher.font_letter_for(4) + "  " + char_sun + "  " + \
+            TransitTeacher.font_letter_for(1) + "  " + char_moon + "  k  " + char_ac
+
+class transits:
+    def GET(self):
+        web.header('Access-Control-Allow-Origin',      '*')
+        web.header('Access-Control-Allow-Credentials', 'true')        
+        
+        TransitTeacher.initialize()
+        astrolog = Astrolog()
+        transits = astrolog.transits_now()
+        teacher = TransitTeacher()
+
+        return teacher.explain_all(transits)
 
 class astrolog:
     def GET(self):
@@ -32,25 +44,10 @@ class astrolog:
 astrolog_dir = "astrolog"
 
 def get_and_parse_astrolog():
-    astrolog_output = get_astrolog_output()
+    astrolog = Astrolog()
+    astrolog_output = astrolog.planets_now()
     data = parse_astrolog(astrolog_output)
     return data
-
-def get_astrolog_output():
-    filename = str(time.time())
-    process = subprocess.Popen(["./astrolog", "-n", "-o0", filename],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=astrolog_dir)
-    process.communicate()
-
-    filename = os.path.join(astrolog_dir, filename)
-    file = open(filename)
-    lines = file.read().splitlines()
-    file.close()
-    os.remove(filename)
-
-    return lines
 
 planet_numbers = { "Moon": 1, "Merc": 2, "Venu": 3, "Sun": 4, "Mars": 5, "Jupi": 6, "Satu": 7,
     "Uran": 8, "Nept": 9, "Plut": 10 }

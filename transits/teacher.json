@@ -1,0 +1,104 @@
+{
+  "planets": {
+    "1": {
+      "name": "la luna",
+      "desc": "nuestro mundo emocional, nuestras necesidades más primarias, nuestra capacidad de dar y recibir afecto"
+    },
+    "2": {
+      "name": "mercurio",
+      "desc": "nuestra capacidad de comunicar de forma verbal o escrita, de conectar ideas, de mover información"
+    },
+    "3": {
+      "name": "venus",
+      "desc": "nuestra capacidad de espera activa, de complementarnos con un otro, nuestra sensualidad, nuestro arte y mundo afectivo"
+    },
+    "4": {
+      "name": "el sol",
+      "desc": "nuestra necesidad de manifestación, ese propósito vital y único, aquello que nos hace individualmente únicos, aquello vitalmente creativo"
+    },
+    "5": {
+      "name": "marte",
+      "desc": "nuestro impulso, capacidad de determinación, de pasar a la acción, al cuerpo, al movimiento y al deseo"
+    },
+    "6": {
+      "name": "júpiter",
+      "desc": "nuestras creencias y capacidad de dar sentido, nuestra fe y confianza en la vida"
+    },
+    "7": {
+      "name": "saturno",
+      "desc": "nuestra capacidad de autosostenernos, de ser responsables y de cumplir acuerdos"
+    },
+    "8": {
+      "name": "urano",
+      "desc": "nuestra necesidad de diferencia, de libertad y desapego, nuestra creatividad esencial y búsqueda de lo vanguardista"
+    },
+    "9": {
+      "name": "neptuno",
+      "desc": "nuestras necesidades de unión y valores espirituales más elevados, nuestra capacidad de profundo discernimiento intuitivo, nuestra búsqueda de trascendencia"
+    },
+    "10": {
+      "name": "plutón",
+      "desc": "nuestra capaciad de ver lo negado, de profundizar para sanar, de colapsar viejas estructuras y liberar grandes cantidades de energía estancada"
+    }
+  },
+  "signs": {
+    "1": {
+      "name": "aries"
+    },
+    "2": {
+      "name": "tauro"
+    },
+    "3": {
+      "name": "géminis"
+    },
+    "4": {
+      "name": "cáncer"
+    },
+    "5": {
+      "name": "leo"
+    },
+    "6": {
+      "name": "virgo"
+    },
+    "7": {
+      "name": "libra"
+    },
+    "8": {
+      "name": "escorpio"
+    },
+    "9": {
+      "name": "sagitario"
+    },
+    "10": {
+      "name": "capricornio"
+    },
+    "11": {
+      "name": "acuario"
+    },
+    "12": {
+      "name": "piscis"
+    }
+  },
+  "aspects": {
+    "con": {
+      "name": "conjunción",
+      "desc": "se funde con"
+    },
+    "squ": {
+      "name": "cuadratura",
+      "desc": "debe reajustarse con"
+    },
+    "opp": {
+      "name": "oposición",
+      "desc": "se contrapone a"
+    },
+    "sex": {
+      "name": "sextil",
+      "desc": "se armoniza con"
+    },
+    "tri": {
+      "name": "trígono",
+      "desc": "se armoniza con"
+    }
+  }
+}
