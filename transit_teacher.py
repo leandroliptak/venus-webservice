@@ -9,6 +9,9 @@ class TransitTeacher:
 	planet_font_letter = { 1: "s", 2: "o", 3: "l", 4: "j", 5: "m", 6: "i", 7: "n", 8: "v",
 		9: "x", 10: "w" }
 
+	unicode_for_planets = { 1: "☽", 2: "☿", 3: "♀", 4: "⊙", 5: "♂", 6: "♃", 7: "♄", 8: "♅",
+		9: "♆", 10: "♇" }
+
 	unicode_for_signs = { 1: "♈", 2: "♉", 3: "♊", 4: "♋", 5: "♌", 6: "♍", 7: "♎", 8: "♏",
 	    9: "♐", 10: "♑", 11: "♒", 12: "♓" }
 
@@ -27,8 +30,43 @@ class TransitTeacher:
 		return cls.unicode_for_aspects[aspect_code].decode("utf-8")
 
 	@classmethod
+	def unicode_for_planet(cls, sign_number):
+		return cls.unicode_for_planets[sign_number].decode("utf-8")
+
+	@classmethod
 	def font_letter_for(cls, planet_number):
 		return cls.planet_font_letter[planet_number]
+
+	def explain_for_mailing(self, transits):
+		out = StringIO.StringIO()
+
+		for transit in transits:
+			if transit.type == "aspect":
+				first = self.planet(transit.planet)
+				second = self.planet(transit.second_planet)
+				aspect = self.aspect(transit.aspect)
+
+				out.write("<span style='font-size: 24px;'>")
+				out.write(self.unicode_for_planet(transit.planet) + " " +
+					self.unicode_for_aspect(transit.aspect.lower()) + " " +
+					self.unicode_for_planet(transit.second_planet) + " ")
+
+				out.write(first["name"].capitalize() + " en " +
+					aspect["name"] + " a " + second["name"])
+				out.write("</span><br>")
+
+				out.write("<p>" + first["desc"].capitalize() + " " + aspect["desc"]
+					+ " " + second["desc"] + ".</p><br><br>")
+			elif transit.type == "enter":
+				first = self.planet(transit.planet)
+				sign = self.sign(transit.enter_sign)
+				out.write("<span style='font-size: 24px;'>")
+				out.write(self.unicode_for_planet(transit.planet) + " " +
+					self.unicode_for(transit.enter_sign) + " ")				
+				out.write(first["name"].capitalize() + " entra en el signo de " + sign["name"])
+				out.write("</span><br><br>")
+
+		return out.getvalue()
 
 	def explain_all(self, transits):
 		out = StringIO.StringIO()

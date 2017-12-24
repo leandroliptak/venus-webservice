@@ -6,7 +6,8 @@ from astrolog_wrapper import Astrolog
 urls = (
     '/astrolog', 'astrolog',
     '/astrolog/now', 'now',
-    '/astrolog/transits', 'transits'
+    '/astrolog/transits', 'transits',
+    '/astrolog/transits_mailing', 'transits_mailing'
 )
 
 app = web.application(urls, globals())
@@ -35,6 +36,18 @@ class transits:
         teacher = TransitTeacher()
 
         return teacher.explain_all(transits)
+
+class transits_mailing:
+    def GET(self):
+        web.header('Access-Control-Allow-Origin',      '*')
+        web.header('Access-Control-Allow-Credentials', 'true')        
+        
+        TransitTeacher.initialize()
+        astrolog = Astrolog()
+        transits = astrolog.transits_now()
+        teacher = TransitTeacher()
+
+        return teacher.explain_for_mailing(transits)
 
 class astrolog:
     def GET(self):
