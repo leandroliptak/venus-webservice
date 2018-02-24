@@ -10,6 +10,9 @@ class Astrolog:
 	sign_numbers = { "Ari": 1, "Tau": 2, "Gem": 3, "Can": 4, "Leo": 5, "Vir": 6, "Lib": 7,
 	    "Sco": 8, "Sag": 9, "Cap": 10, "Aqu": 11, "Pis": 12 }
 
+	house_numbers = { "Asce": 1, "2nd": 2, "3rd": 3, "4th": 4, "5th": 5, "6th": 6, "Desc": 7,
+	    "8th": 8, "9th": 9, "Midh": 10, "11th": 11, "12th": 12 }
+
 	def transits_now(self):
 		out, err = self.run("-d", "-n")
 		lines = string.join(out, "").splitlines()
@@ -68,3 +71,25 @@ class Astrolog:
 		os.remove(filename)
 
 		return lines
+
+	def parse(self, input):
+	    planets = {}
+	    houses = {}
+
+	    for line in input[2:]:
+	        splitted = filter(None, line.split(" "))
+	        planet_or_house = splitted[1]
+
+	        data = {}
+	        if planet_or_house in self.planet_numbers:
+	            number = self.planet_numbers[planet_or_house]
+	            data["sign"] = self.sign_numbers[splitted[3]]
+	            data["degree"] = splitted[2]
+	            planets[number] = data
+	        elif planet_or_house in self.house_numbers:
+	            number = self.house_numbers[planet_or_house]
+	            data["sign"] = self.sign_numbers[splitted[3]]
+	            data["degree"] = splitted[2]
+	            houses[number] = data
+
+	    return { "planets": planets, "houses": houses}
