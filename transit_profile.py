@@ -40,14 +40,14 @@ def run_date(person, date):
 		"-RT0", "6", "7", "8", "9", "10",
 		"-RA", "Tri", "Sex",
 		"-c", "1", # Casas Koch
-		"-RC", "22", "34", # Incluyo cúspides de casas
+		"-RC", "22", "31", # Incluyo cúspides de casas
 		"-Ao", "Opp", "3", "-Ao", "Con", "3", "-Ao", "Squ", "3")
 	lines = string.join(out, "").splitlines()
 
 	for transit_influence in lines:
 		if transit_influence == "Empty transit list.": continue
 		
-		w = transit_influence.split(" - ")
+		w = transit_influence.split("- ")
 		orb = w[1].split(" ")[1]
 		power = float(w[-1].split(":")[-1].split(" R")[0])
 
@@ -207,17 +207,19 @@ def create_pdf():
 		os.remove(out_dir + image)
 		image_index = image_index + 1
 
-	pdf.output("miguel.pdf", "F")	
+	pdf.output("profile.pdf", "F")	
 
 #########################################################################################################
 #########################################################################################################
 
-start_date = parser.parse("1 Jan 2018")
-end_date = parser.parse("1 Jan 2020")
+start_date = parser.parse("1 Jan 2000")
+end_date = parser.parse("1 Jan 2010")
 
 run("leandro", start_date, end_date)
 
-natal_order = ["Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"]
+natal_order = ["Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto",
+	"Ascendant", "Midheaven", "Descendant", "Nadir",
+	"2nd", "3rd", "5th", "6th", "8th", "9th", "11th", "12th"]
 transit_order = ["Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"]
 
 for natal in natal_order:
