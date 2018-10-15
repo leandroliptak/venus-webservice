@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import time, os, web, subprocess, json
+from web import form
 from transit_teacher import TransitTeacher
 from astrolog_wrapper import Astrolog
 
@@ -7,10 +10,13 @@ urls = (
     '/astrolog', 'astrolog',
     '/astrolog/now', 'now',
     '/astrolog/transits', 'transits',
-    '/astrolog/transits_mailing', 'transits_mailing'
+    '/astrolog/transits_mailing', 'transits_mailing',
+    '/astrolog/interface', 'interface'
 )
 
 app = web.application(urls, globals())
+
+render = web.template.render('templates/')
 
 class now:
     def GET(self):
@@ -48,6 +54,35 @@ class transits_mailing:
         teacher = TransitTeacher()
 
         return teacher.explain_for_mailing(transits)
+
+interfaceForm = form.Form(
+    form.Textbox("Nombre"),
+    form.Textbox(u"Día"),
+    form.Textbox("Mes"),
+    form.Textbox(u"Año"),
+    form.Textbox("Hora"),
+    form.Textbox("Uso horario"),
+    form.Textbox("Longitud"),
+    form.Textbox("Latitud"),
+    form.Textbox("Lugar"),
+    )
+
+class interface:
+    def GET(self):
+        web.header('Access-Control-Allow-Origin',      '*')
+        web.header('Access-Control-Allow-Credentials', 'true')        
+
+        f = interfaceForm()
+        return render.interface(f)
+    def POST(self):
+        data = web.input()
+
+        astrolog = Astrolog()        
+        out, err = astrolog.run("-qb", data["Mes"], data["Día"], data["Año"], data["Hora"], "ST",
+            data["Uso horario"], data["Longitud"], data["Latitud"], "-zi", data["Nombre"],
+            data["Lugar"])
+
+        return out
 
 class astrolog:
     def GET(self):

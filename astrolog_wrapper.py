@@ -84,12 +84,14 @@ class Astrolog:
 	        if planet_or_house in self.planet_numbers:
 	            number = self.planet_numbers[planet_or_house]
 	            data["sign"] = self.sign_numbers[splitted[3]]
-	            data["degree"] = splitted[2]
+	            data["degree"] = int(splitted[2])
+	            data["minute"] = int(splitted[4].split(".")[0])
 	            planets[number] = data
 	        elif planet_or_house in self.house_numbers:
 	            number = self.house_numbers[planet_or_house]
 	            data["sign"] = self.sign_numbers[splitted[3]]
-	            data["degree"] = splitted[2]
+	            data["degree"] = int(splitted[2])
+	            data["minute"] = int(splitted[4].split(".")[0])
 	            houses[number] = data
 
 	    return { "planets": planets, "houses": houses}
