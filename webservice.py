@@ -22,8 +22,8 @@ class now:
         char_moon = TransitTeacher.unicode_for(data["planets"][1]["sign"])
         char_ac = TransitTeacher.unicode_for(data["houses"][1]["sign"])
 
-        return TransitTeacher.font_letter_for(4) + "  " + char_sun + "  " + \
-            TransitTeacher.font_letter_for(1) + "  " + char_moon + "  k  " + char_ac
+        return TransitTeacher.font_letter_for(4) + char_sun + "  " + \
+            TransitTeacher.font_letter_for(1) + char_moon + "  P" + char_ac
 
 class transits:
     def GET(self):
