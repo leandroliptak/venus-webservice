@@ -20,6 +20,7 @@ from dateutil import parser
 from datetime import timedelta
 
 import os
+import sys
 
 out_dir = "img/"
 
@@ -29,6 +30,11 @@ day_shift = 5
 profile = {}
 
 def run(person, start_date, end_date):
+	print "Perfil:", person
+	print "Desde:", start_date
+	print "Hasta:", end_date
+	print "--"
+
 	d = start_date
 	while d < end_date:
 		run_date(person, d)
@@ -212,10 +218,14 @@ def create_pdf():
 #########################################################################################################
 #########################################################################################################
 
-start_date = parser.parse("1 Jan 2000")
-end_date = parser.parse("1 Jan 2010")
+if len(sys.argv) < 4:
+	print "Parámetros: <persona> <fecha_desde> <fecha_hasta>"
+	quit()
 
-run("leandro", start_date, end_date)
+start_date = parser.parse(sys.argv[2])
+end_date = parser.parse(sys.argv[3])
+
+run(sys.argv[1], start_date, end_date)
 
 natal_order = ["Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto",
 	"Ascendant", "Midheaven", "Descendant", "Nadir",
