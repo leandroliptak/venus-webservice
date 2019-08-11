@@ -7,10 +7,22 @@ urls = (
     '/astrolog', 'astrolog',
     '/astrolog/now', 'now',
     '/astrolog/transits', 'transits',
-    '/astrolog/transits_mailing', 'transits_mailing'
+    '/astrolog/transits_mailing', 'transits_mailing',
+    '/astrolog/person', 'person'
 )
 
 app = web.application(urls, globals())
+
+class person:
+    def GET(self):
+        web.header('Access-Control-Allow-Origin',      '*')
+        web.header('Access-Control-Allow-Credentials', 'true')        
+
+        data = web.input()
+
+        astrolog = Astrolog()
+
+        return astrolog.person(data["date"], data["time"], data["place"])
 
 class now:
     def GET(self):

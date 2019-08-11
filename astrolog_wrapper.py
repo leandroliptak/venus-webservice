@@ -1,5 +1,12 @@
 import time, os, web, subprocess, string, re
 from transit import Transit
+import json
+
+import datetime as dt
+
+import geocoder as gc
+import pytz
+from tzwhere import tzwhere
 
 class Astrolog:
 	astrolog_dir = "astrolog"
@@ -12,6 +19,57 @@ class Astrolog:
 
 	house_numbers = { "Asce": 1, "2nd": 2, "3rd": 3, "4th": 4, "5th": 5, "6th": 6, "Desc": 7,
 	    "8th": 8, "9th": 9, "Midh": 10, "11th": 11, "12th": 12 }
+
+	def location(self, place):
+		g = list(gc.arcgis(place))
+		location = g[0]
+
+		print location.address
+		print location.latlng
+		return location
+
+	def hour_shift(self, date_time, location):
+		_tzwhere = tzwhere.tzwhere()
+		timezone_str = _tzwhere.tzNameAt(location.latlng[0], location.latlng[1])
+
+		print timezone_str
+
+		timezone = pytz.timezone(timezone_str)
+		tz_offset = timezone.utcoffset(date_time)
+
+		hour_shift = int(tz_offset.total_seconds() / 3600)
+		return hour_shift
+
+	def mm_ss(self, decimal):
+		date_time = dt.datetime(1990, 1, 1) + dt.timedelta(minutes=abs(decimal))
+		sexagesimal = 60 * date_time.hour + date_time.minute + float(date_time.second) / 100
+		return sexagesimal if decimal > 0 else -sexagesimal
+
+	def person_arg_error_json(self, key):
+		return json.dumps({ "error" : key })
+
+	def person(self, date, time, place):
+		try:
+			date_time = dt.datetime.strptime(date + " " + time, "%d/%m/%Y %H:%M")
+		except:
+			return self.person_arg_error_json("date")
+
+		try:
+			location = self.location(place)
+		except:
+			return self.person_arg_error_json("place")
+
+		hour_shift = self.hour_shift(date_time, location)
+
+		_lat = self.mm_ss(location.latlng[0])
+		_long = -self.mm_ss(location.latlng[1])
+
+		print _lat, _long
+
+		out, err = self.run("-qb", date_time.month, date_time.day, date_time.year,
+			date_time.time(), "ST", -hour_shift, _long, _lat)
+
+		return out
 
 	def transits_now(self):
 		out, err = self.run("-d", "-n")
@@ -53,7 +111,7 @@ class Astrolog:
 		return self.run_to_file("-n")
 
 	def run(self, *parameters):
-		process = subprocess.Popen(["./astrolog"] + list(parameters),
+		process = subprocess.Popen(["./astrolog"] + [ str(p) for p in list(parameters)],
 			stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE,
 			cwd=self.astrolog_dir)
