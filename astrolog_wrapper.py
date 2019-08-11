@@ -23,9 +23,6 @@ class Astrolog:
 	def location(self, place):
 		g = list(gc.arcgis(place))
 		location = g[0]
-
-		print location.address
-		print location.latlng
 		return location
 
 	def hour_shift(self, date_time, location):
@@ -69,6 +66,7 @@ class Astrolog:
 		out, err = self.run("-qb", date_time.month, date_time.day, date_time.year,
 			date_time.time(), "ST", -hour_shift, _long, _lat)
 
+		out = location.address + "\n" + out
 		return out
 
 	def transits_now(self):
