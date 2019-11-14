@@ -61,13 +61,16 @@ class Astrolog:
 		_lat = self.mm_ss(location.latlng[0])
 		_long = -self.mm_ss(location.latlng[1])
 
-		print _lat, _long
-
-		out, err = self.run("-qb", date_time.month, date_time.day, date_time.year,
+		out = self.run_to_file("-qb", date_time.month, date_time.day, date_time.year,
 			date_time.time(), "ST", -hour_shift, _long, _lat)
 
-		out = location.address + "\n" + out
-		return out
+		data = self.parse(out)
+		data["place"] = { "address" : location.address,
+			"lat": location.latlng[0],
+			"lng": location.latlng[1] }
+		data["tz"] = hour_shift
+
+		return json.dumps(data)
 
 	def transits_now(self):
 		out, err = self.run("-d", "-n")
