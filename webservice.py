@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import time, os, web, subprocess, json
 from transit_teacher import TransitTeacher
 from astrolog_wrapper import Astrolog

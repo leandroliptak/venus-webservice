@@ -8,6 +8,11 @@ import geocoder as gc
 import pytz
 from tzwhere import tzwhere
 
+from googleapiclient.discovery import build
+from httplib2 import Http
+from oauth2client import file, client, tools
+from oauth2client.tools import argparser
+
 class Astrolog:
 	astrolog_dir = "astrolog"
 
@@ -19,6 +24,38 @@ class Astrolog:
 
 	house_numbers = { "Asce": 1, "2nd": 2, "3rd": 3, "4th": 4, "5th": 5, "6th": 6, "Desc": 7,
 	    "8th": 8, "9th": 9, "Midh": 10, "11th": 11, "12th": 12 }
+
+	def load_videos(self):
+		# If modifying these scopes, delete the file token.json.
+		SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
+
+		# The ID and range of a sample spreadsheet.
+		SAMPLE_SPREADSHEET_ID = '1rXUfCF9dxwlJ2syF1ibKDftdYM8_6cw051_Wfy66-D4'
+		SAMPLE_RANGE_NAME = 'Videos!A:C'
+
+		args = argparser.parse_args()
+		args.noauth_local_webserver = True    
+
+		store = file.Storage('token.json')
+		creds = store.get()
+
+		if not creds or creds.invalid:
+		    flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
+		    creds = tools.run_flow(flow, store, args)
+		service = build('sheets', 'v4', http=creds.authorize(Http()))
+
+		sheet = service.spreadsheets()
+		result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
+		                            range=SAMPLE_RANGE_NAME).execute()
+		values = result.get('values', [])
+
+		self.videos = {}
+
+		for v in values:
+			self.videos[(v[0], v[1])] = v[2]
+
+	def __init__(self):
+		self.load_videos()
 
 	def location(self, place):
 		g = list(gc.arcgis(place))
@@ -64,7 +101,17 @@ class Astrolog:
 		out = self.run_to_file("-qb", date_time.month, date_time.day, date_time.year,
 			date_time.time(), "ST", -hour_shift, _long, _lat)
 
-		data = self.parse(out)
+		_data = self.parse(out)
+
+		data = {}
+		asc_sign = str(_data["houses"][1]["sign"])
+		sun_sign = str(_data["planets"][4]["sign"])
+		moon_sign = str(_data["planets"][1]["sign"])
+
+		data["asc"] = { "sign": asc_sign, "video": self.videos[('ASC', asc_sign)] }
+		data["sun"] = { "sign": sun_sign, "video": self.videos[('SOL', sun_sign)] }
+		data["moon"] = { "sign": moon_sign, "video": self.videos[('LUNA', moon_sign)] }
+
 		data["place"] = { "address" : location.address,
 			"lat": location.latlng[0],
 			"lng": location.latlng[1] }
