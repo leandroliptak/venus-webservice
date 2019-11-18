@@ -4,6 +4,12 @@ import time, os, web, subprocess, json
 from transit_teacher import TransitTeacher
 from astrolog_wrapper import Astrolog
 
+from web.wsgiserver import CherryPyWSGIServer
+ssl_cert = '/etc/letsencrypt/live/cursodeastrologia.com.ar/cert.pem'
+ssl_key = '/etc/letsencrypt/live/cursodeastrologia.com.ar/privkey.pem'
+CherryPyWSGIServer.ssl_certificate = ssl_cert
+CherryPyWSGIServer.ssl_private_key = ssl_key
+
 urls = (
     '/astrolog', 'astrolog',
     '/astrolog/now', 'now',
