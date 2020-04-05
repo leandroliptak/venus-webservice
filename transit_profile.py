@@ -204,7 +204,7 @@ def create_pdf():
 	for image in transit_images:
 		if image_index > 1:
 			pdf.add_page()
-			pdf.image("header.png", 15, 15, 100)
+			#pdf.image("header.png", 15, 15, 100)
 			image_index = 0
 
 		x, y = image_positions[image_index]
