@@ -6,16 +6,16 @@ import StringIO
 class TransitTeacher:
 	db = {}
 
-	planet_font_letter = { 1: "s", 2: "o", 3: "l", 4: "j", 5: "m", 6: "i", 7: "n", 8: "v",
-		9: "x", 10: "w" }
+	planet_font_letter = { 1: "B", 2: "C", 3: "D", 4: "A", 5: "E", 6: "F", 7: "G", 8: "H",
+		9: "I", 10: "J" }
 
 	unicode_for_planets = { 1: "☽", 2: "☿", 3: "♀", 4: "⊙", 5: "♂", 6: "♃", 7: "♄", 8: "♅",
 		9: "♆", 10: "♇" }
 
-	unicode_for_signs = { 1: "♈", 2: "♉", 3: "♊", 4: "♋", 5: "♌", 6: "♍", 7: "♎", 8: "♏",
-	    9: "♐", 10: "♑", 11: "♒", 12: "♓" }
+	unicode_for_signs = { 1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f", 7: "g", 8: "h",
+	    9: "i", 10: "j", 11: "k", 12: "l" }
 
-	unicode_for_aspects = { "opp": "☍", "sex": "⚹", "tri": "△", "squ": "□", "con": "☌" }
+	unicode_for_aspects = { "opp": "n", "sex": "q", "tri": "p", "squ": "o", "con": "m" }
 
 	@classmethod
 	def initialize(cls):

@@ -1,22 +1,35 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import time, os, web, subprocess, json
-from web import form
 from transit_teacher import TransitTeacher
 from astrolog_wrapper import Astrolog
+
+from web.wsgiserver import CherryPyWSGIServer
+ssl_cert = '/etc/letsencrypt/live/cursodeastrologia.com.ar/cert.pem'
+ssl_key = '/etc/letsencrypt/live/cursodeastrologia.com.ar/privkey.pem'
+CherryPyWSGIServer.ssl_certificate = ssl_cert
+CherryPyWSGIServer.ssl_private_key = ssl_key
 
 urls = (
     '/astrolog', 'astrolog',
     '/astrolog/now', 'now',
     '/astrolog/transits', 'transits',
     '/astrolog/transits_mailing', 'transits_mailing',
-    '/astrolog/interface', 'interface'
+    '/astrolog/person', 'person'
 )
 
 app = web.application(urls, globals())
 
-render = web.template.render('templates/')
+class person:
+    def GET(self):
+        web.header('Access-Control-Allow-Origin',      '*')
+        web.header('Access-Control-Allow-Credentials', 'true')        
+
+        data = web.input()
+
+        astrolog = Astrolog()
+
+        return astrolog.person(data["date"], data["time"], data["place"])
 
 class now:
     def GET(self):
@@ -28,8 +41,8 @@ class now:
         char_moon = TransitTeacher.unicode_for(data["planets"][1]["sign"])
         char_ac = TransitTeacher.unicode_for(data["houses"][1]["sign"])
 
-        return TransitTeacher.font_letter_for(4) + "  " + char_sun + "  " + \
-            TransitTeacher.font_letter_for(1) + "  " + char_moon + "  k  " + char_ac
+        return TransitTeacher.font_letter_for(4) + char_sun + "  " + \
+            TransitTeacher.font_letter_for(1) + char_moon + "  P" + char_ac
 
 class transits:
     def GET(self):
@@ -54,35 +67,6 @@ class transits_mailing:
         teacher = TransitTeacher()
 
         return teacher.explain_for_mailing(transits)
-
-interfaceForm = form.Form(
-    form.Textbox("Nombre"),
-    form.Textbox(u"Día"),
-    form.Textbox("Mes"),
-    form.Textbox(u"Año"),
-    form.Textbox("Hora"),
-    form.Textbox("Uso horario"),
-    form.Textbox("Longitud"),
-    form.Textbox("Latitud"),
-    form.Textbox("Lugar"),
-    )
-
-class interface:
-    def GET(self):
-        web.header('Access-Control-Allow-Origin',      '*')
-        web.header('Access-Control-Allow-Credentials', 'true')        
-
-        f = interfaceForm()
-        return render.interface(f)
-    def POST(self):
-        data = web.input()
-
-        astrolog = Astrolog()        
-        out, err = astrolog.run("-qb", data["Mes"], data["Día"], data["Año"], data["Hora"], "ST",
-            data["Uso horario"], data["Longitud"], data["Latitud"], "-zi", data["Nombre"],
-            data["Lugar"])
-
-        return out
 
 class astrolog:
     def GET(self):
