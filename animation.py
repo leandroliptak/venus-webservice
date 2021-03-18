@@ -15,6 +15,7 @@ import matplotlib.ticker as mticker
 from fpdf import FPDF
 
 import calendar
+import pandas as pd
 
 import string
 from astrolog_wrapper import Astrolog
@@ -31,12 +32,46 @@ out_dir = "img/"
 astrolog = Astrolog()
 day_shift = 5
 
+planets = ["Saturn", "Uranus", "Neptune", "Pluto", "Jupiter"]
+colors = { "Pluto": "#B62A3D", "Saturn": "#B5966D", "Jupiter": "#EDCB64", "Neptune": "#CECD7B", "Uranus": "#DAECED" }
+
 profile = {}
+by_date = {}
 
 Writer = animation.writers['ffmpeg']
 writer = Writer(fps=20, metadata=dict(artist='Leandro Liptak'), bitrate=1800)
 
-def run(person, start_date, end_date):
+fig, ax = plt.subplots(figsize=(10,6))
+
+def race(date):
+	run_date(p, date)
+	df = pd.DataFrame(data=by_date[date].iteritems())
+	dff = df.sort_values(by=1, ascending=True)
+	ax.clear()
+	ax.barh(dff[0], dff[1], color=[ colors[x] for x in dff[0] ])
+	
+	dx = dff[1].max() / 200
+	for i, (value, name) in enumerate(zip(dff[1], dff[0])):
+		if value > 30:
+			ax.text(value-dx, i,     name,           size=14, weight=600, ha='right', va='bottom')
+			ax.text(value+dx, i,     value,  size=10, ha='left',  va='center')
+
+	ax.text(1, 0.2, date.strftime("%d/%m/%Y"), transform=ax.transAxes, color='#777777', size=30, ha='right', weight=800)
+
+	ax.xaxis.set_major_formatter(mticker.StrMethodFormatter('{x:,.0f}'))
+	ax.xaxis.set_ticks_position('top')
+	
+	ax.tick_params(axis='x', colors='#777777', labelsize=10)
+	ax.tick_params(axis='y', colors='#777777', labelsize=10)
+
+	#ax.set_yticks([])
+	ax.margins(0, 0.01)
+	ax.grid(which='major', axis='x', linestyle='-')
+	ax.set_axisbelow(True)
+
+	plt.box(False)
+
+def run(person, start_date, end_date, f):
 	print "Perfil:", person
 	print "Desde:", start_date
 	print "Hasta:", end_date
@@ -44,11 +79,11 @@ def run(person, start_date, end_date):
 
 	d = start_date
 	while d < end_date:
-		run_date(person, d)
+		f(person, d)
 		d = d + timedelta(days=day_shift)
 
 def run_date(person, date):
-	print "Date", date
+	#print "Date", date
 	out = astrolog.run("-i", person, "-T", str(date.month), str(date.day), str(date.year),
 		"-RT0", "6", "7", "8", "9", "10",
 		"-RA", "Tri", "Sex",
@@ -56,6 +91,10 @@ def run_date(person, date):
 		"-RC", "22", "31", # Incluyo cúspides de casas
 		"-Ao", "Opp", "3", "-Ao", "Con", "3", "-Ao", "Squ", "3")
 	lines = string.join(out, "").splitlines()
+
+	by_date[date] = {}
+	for planet in planets:
+		by_date[date][planet] = 0
 
 	for transit_influence in lines:
 		if transit_influence == "Empty transit list.": continue
@@ -84,12 +123,10 @@ def run_date(person, date):
 				transit_profile.pop()
 
 		transit_profile.append((date, power))
+		by_date[date][key] = power
 
 def analysis(sdate, edate):
-	fig, ax = plt.subplots(figsize=(10,6))
-
 	dataset = {}
-	planets = ["Saturn", "Uranus", "Neptune", "Pluto"]
 
 	min = 0
 	max = 0
@@ -97,6 +134,7 @@ def analysis(sdate, edate):
 	max_x = []
 
 	for transit in planets:
+		if not transit in profile: continue
 		period = profile[transit]
 
 		if len(period) < 4: return # No se puede interpolar con menos de 4 elementos
@@ -143,6 +181,8 @@ def analysis(sdate, edate):
 
 		for n in range(0, len(planets)):
 			planet = planets[n]
+			if planet not in dataset: continue
+
 			ln = lines[n]
 			x = dataset[planet]["x"]
 			f = dataset[planet]["f"]
@@ -168,11 +208,16 @@ def analysis(sdate, edate):
 	ax.tick_params(axis ='x', rotation = 45)
 
 	ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
-	          ncol=2, fancybox=True, shadow=True)
-	plt.show()
+	          ncol=3, fancybox=True, shadow=True)
+	#plt.show()
 	
-	#ani.save('video.mp4', writer=writer)
-	#plt.savefig(out_dir + "%s_%s_%s_%s.png" % (start_year, natal, transit, aspect))
+	ani.save('video.mp4', writer=writer)
+	#html = open("out.html", "w")
+	#html.write("<html><body>")
+	#html.write(ani.to_html5_video())
+	#html.write("</body></html>")
+	#html.close()
+	#plt.savefig(out_dir + "%_s%s_%s_%s.png" % (start_year, natal, transit, aspect))
 
 
 if len(sys.argv) < 4:
@@ -181,6 +226,20 @@ if len(sys.argv) < 4:
 
 start_date = parser.parse(sys.argv[2])
 end_date = parser.parse(sys.argv[3])
+p = sys.argv[1]
 
-run(sys.argv[1], start_date, end_date)
-analysis(start_date, end_date)
+if len(sys.argv) == 5 and sys.argv[4] == "race":
+	dates = pd.date_range(start=start_date, end=end_date, freq='1D')
+	ani = animation.FuncAnimation(fig, race, frames=dates)
+
+	#html = open("out.html", "w")
+	#html.write("<html><body>")
+	#html.write(ani.to_html5_video())
+	#html.write("</body></html>")
+	#html.close()
+
+	ani.save('video.mp4', writer=writer)
+	plt.show()
+else:
+	run(p, start_date, end_date, run_date)
+	analysis(start_date, end_date)
