@@ -3,22 +3,32 @@
 import time, os, web, subprocess, json
 from transit_teacher import TransitTeacher
 from astrolog_wrapper import Astrolog
+import transit_profile as tp
 
-from web.wsgiserver import CherryPyWSGIServer
+#from web.wsgiserver import CherryPyWSGIServer
 ssl_cert = '/etc/letsencrypt/live/cursodeastrologia.com.ar/cert.pem'
 ssl_key = '/etc/letsencrypt/live/cursodeastrologia.com.ar/privkey.pem'
-CherryPyWSGIServer.ssl_certificate = ssl_cert
-CherryPyWSGIServer.ssl_private_key = ssl_key
+#CherryPyWSGIServer.ssl_certificate = ssl_cert
+#CherryPyWSGIServer.ssl_private_key = ssl_key
 
 urls = (
     '/astrolog', 'astrolog',
     '/astrolog/now', 'now',
     '/astrolog/transits', 'transits',
     '/astrolog/transits_mailing', 'transits_mailing',
-    '/astrolog/person', 'person'
+    '/astrolog/person', 'person',
+    '/astrolog/astrobio', 'astrobio'    
 )
 
 app = web.application(urls, globals())
+
+class astrobio:
+    def GET(self):
+        web.header('Access-Control-Allow-Origin',      '*')
+        web.header('Access-Control-Allow-Credentials', 'true')        
+
+        data = web.input()
+        return tp.from_webservice(data)
 
 class person:
     def GET(self):
