@@ -9,6 +9,10 @@ from operator import itemgetter
 import numpy as np
 from scipy.signal import argrelmax
 from scipy.interpolate import interp1d
+
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 
 from fpdf import FPDF
@@ -35,7 +39,7 @@ from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 
 sender_address = 'leandroliptak.com@gmail.com'
-sender_pass = 'creoenlamagia'
+sender_pass = 'ugzayvkmcyvwgrzm'
 
 base_dir = "img/"
 

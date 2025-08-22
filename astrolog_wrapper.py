@@ -7,6 +7,7 @@ import datetime as dt
 import geocoder as gc
 import pytz
 from tzwhere import tzwhere
+_TZ = tzwhere.tzwhere()
 
 from googleapiclient.discovery import build
 from httplib2 import Http
@@ -63,8 +64,8 @@ class Astrolog:
 		return location
 
 	def hour_shift(self, date_time, location):
-		_tzwhere = tzwhere.tzwhere()
-		timezone_str = _tzwhere.tzNameAt(location.latlng[0], location.latlng[1])
+		#_tzwhere = tzwhere.tzwhere()
+		timezone_str = _TZ.tzNameAt(location.latlng[0], location.latlng[1])
 
 		print timezone_str
 
@@ -84,7 +85,7 @@ class Astrolog:
 
 	def person(self, date, time, place):
 		try:
-			date_time = dt.datetime.strptime(date + " " + time, "%d/%m/%Y %H:%M")
+			date_time = dt.datetime.strptime(date + " " + time, "%Y-%m-%d %H:%M")
 		except:
 			return self.person_arg_error_json("date")
 
